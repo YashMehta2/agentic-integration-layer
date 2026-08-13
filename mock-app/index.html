@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Core Banking - Member Lookup</title>
+    <style>
+        body { font-family: "Courier New", Courier, monospace; background: #e0e0e0; padding: 20px; }
+        .container { background: white; border: 2px solid #333; padding: 20px; width: 600px; margin: 0 auto; }
+        .header { background: #000080; color: white; padding: 10px; text-align: center; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 8px; text-align: left; }
+        .search-area { margin: 20px 0; border: 1px dotted #666; padding: 15px; }
+        .error { color: red; font-weight: bold; margin-top: 10px; display: none; }
+        
+        /* Simulating bad practices */
+        .btn-submit { background: #d4d0c8; border: 2px outset white; padding: 5px 15px; cursor: pointer; }
+        .btn-submit:active { border-style: inset; }
+        
+        #overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+        }
+        #modal {
+            background: white; border: 3px solid #000080; padding: 20px;
+            width: 300px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">SYSTEM 36 - BACKOFFICE TERMINAL</div>
+    
+    <div class="search-area">
+        <!-- Purposely omitting clean ID/name/aria tags for input -->
+        <label>ENTER MEMBER ID:</label>
+        <input type="text" class="txt-input-992" placeholder="e.g. 12345">
+        <button class="btn-submit" onclick="performSearch()">SEARCH</button>
+        <div id="error-msg" class="error">MEMBER NOT FOUND</div>
+    </div>
+
+    <!-- Deeply nested table to simulate legacy structure -->
+    <table id="results-table" style="display: none;">
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <th style="width: 30%">MEMBER NAME</th>
+                        <td id="res-name">--</td>
+                    </tr>
+                    <tr>
+                        <th>ACCOUNT STATUS</th>
+                        <td id="res-status">--</td>
+                    </tr>
+                    <tr>
+                        <th>CURRENT BALANCE</th>
+                        <!-- Hard to target by ID, simulate no test IDs -->
+                        <td><span class="balance-val">$0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding-top: 15px;">
+                            <button class="btn-submit" onclick="openActionModal()">OPEN SUB-ACCOUNT</button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="overlay">
+    <div id="modal">
+        <h3 style="margin-top:0">CONFIRM ACTION</h3>
+        <p>Are you sure you want to open a sub-account for this member?</p>
+        <button class="btn-submit" onclick="confirmAction()">YES, PROCEED</button>
+        <button class="btn-submit" onclick="closeModal()">CANCEL</button>
+        <div id="success-msg" style="color: green; margin-top: 10px; display: none; font-weight: bold;">
+            ACTION COMPLETED SUCCESSFULLY!
+        </div>
+    </div>
+</div>
+
+<script>
+    const mockDB = {
+        "12345": { name: "John Doe", status: "ACTIVE", balance: "$4,520.12" },
+        "99999": { name: "Jane Smith", status: "FROZEN", balance: "$12.00" }
+    };
+
+    function performSearch() {
+        // Find input using bad selector class
+        const input = document.querySelector('.txt-input-992').value;
+        const errorMsg = document.getElementById('error-msg');
+        const resultsTable = document.getElementById('results-table');
+        
+        // Reset state
+        errorMsg.style.display = 'none';
+        resultsTable.style.display = 'none';
+        document.getElementById('success-msg').style.display = 'none';
+
+        // Simulate network delay
+        setTimeout(() => {
+            const member = mockDB[input.trim()];
+            if (member) {
+                document.getElementById('res-name').innerText = member.name;
+                document.getElementById('res-status').innerText = member.status;
+                document.querySelector('.balance-val').innerText = member.balance;
+                resultsTable.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }, 800);
+    }
+
+    function openActionModal() {
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'none';
+    }
+
+    function confirmAction() {
+        setTimeout(() => {
+            document.getElementById('success-msg').style.display = 'block';
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
